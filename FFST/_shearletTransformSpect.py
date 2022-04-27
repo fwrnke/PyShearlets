@@ -86,5 +86,8 @@ def shearletTransformSpect(A, Psi=None, numOfScales=None,
     # -> neglect it
     if realCoefficients and realReal and np.isrealobj(A):
         ST = ST.real
-
-    return (ST, Psi)
+    
+    if Psi is None:
+        return (ST, Psi)
+    else:
+        return ST
