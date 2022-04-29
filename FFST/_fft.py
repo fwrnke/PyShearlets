@@ -6,6 +6,11 @@ from __future__ import division, absolute_import, print_function
 
 import numpy as np
 import warnings
+from importlib import util
+
+pyfftw_enabled = util.find_spec('pyfftw') is not None
+mkl_fft_enabled = util.find_spec('mkl_fft') is not None
+scipy_enabled = util.find_spec('scipy') is not None
 
 
 # try:
@@ -48,31 +53,43 @@ import warnings
 
 # except ImportError as e:
 #     has_pyfftw = False
-#     try:
-#         warnings.warn("pyFFTW not found.  will try to use mklfft instead.")
-#         import mklfft
-#         fft = mklfft.fftpack.fft
-#         ifft = mklfft.fftpack.ifft
-#         fft2 = mklfft.fftpack.fft2
-#         ifft2 = mklfft.fftpack.ifft2
-#         fftn = mklfft.fftpack.fftn
-#         ifftn = mklfft.fftpack.ifftn
-#         fftshift = np.fft.fftshift
-#         ifftshift = np.fft.ifftshift
-#         fftfreq = np.fft.fftfreq
-#     except ImportError as e:
-warnings.warn("neither pyFFTW or mklfft found.  will use numpy.fft.")
-# Numpy's n-dimensional FFT routines may be using MKL, so prefered
-# over scipy
-fft = np.fft.fft
-ifft = np.fft.ifft
-fft2 = np.fft.fft2
-ifft2 = np.fft.ifft2
-fftn = np.fft.fftn
-ifftn = np.fft.ifftn
-fftshift = np.fft.fftshift
-ifftshift = np.fft.ifftshift
-fftfreq = np.fft.fftfreq
+try:
+    import mkl_fft
+    fft = mkl_fft.fft
+    ifft = mkl_fft.ifft
+    fft2 = mkl_fft.fft2
+    ifft2 = mkl_fft.ifft2
+    fftn = mkl_fft.fftn
+    ifftn = mkl_fft.ifftn
+    fftshift = np.fft.fftshift
+    ifftshift = np.fft.ifftshift
+    fftfreq = np.fft.fftfreq
+except ImportError as e:
+    try:
+        warnings.warn("mkl_fft not found.  Will try to use scipy.fft instead.")
+        import scipy.fft
+        fft = scipy.fft.fft
+        ifft = scipy.fft.ifft
+        fft2 = scipy.fft.fft2
+        ifft2 = scipy.fft.ifft2
+        fftn = scipy.fft.fftn
+        ifftn = scipy.fft.ifftn
+        fftshift = scipy.fft.fftshift
+        ifftshift = scipy.fft.ifftshift
+        fftfreq = scipy.fft.fftfreq
+    except ImportError as e:
+        warnings.warn("Neither mkl_fft or scipy.fft found.  Will use numpy.fft instead.")
+        # Numpy's n-dimensional FFT routines may be using MKL, so prefered
+        # over scipy
+        fft = np.fft.fft
+        ifft = np.fft.ifft
+        fft2 = np.fft.fft2
+        ifft2 = np.fft.ifft2
+        fftn = np.fft.fftn
+        ifftn = np.fft.ifftn
+        fftshift = np.fft.fftshift
+        ifftshift = np.fft.ifftshift
+        fftfreq = np.fft.fftfreq
 
 
 __all__ = ['fft', 'fft2', 'fftn', 'fftshift', 'fftfreq',
