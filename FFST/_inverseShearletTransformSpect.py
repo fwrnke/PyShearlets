@@ -4,8 +4,14 @@ import numpy as np
 
 from .meyerShearlet import (meyerShearletSpect, meyeraux)
 from ._scalesShearsAndSpectra import scalesShearsAndSpectra
-from ._fft import fftshift, ifftshift, fftn, ifftn
+# from ._fft import fftshift, ifftshift, fftn, ifftn
+from ._backends import get_module, get_array_module, get_module_name, cupy_enabled, scipy_enabled
 
+if cupy_enabled:
+    import cupy as cp
+if scipy_enabled:
+    import scipy.fft
+    
 
 def inverseShearletTransformSpect(ST, Psi=None, maxScale='max',
                                   shearletSpect=meyerShearletSpect,
@@ -33,7 +39,26 @@ def inverseShearletTransformSpect(ST, Psi=None, maxScale='max',
     A : array (2d)
         reconstructed image
 
-    """
+    """    
+    # get array module, i.e cupy or numpy (default)
+    xp = get_array_module(ST)
+    
+    if get_module_name(xp) == 'cupy':
+        warnings.warn('Using CuPy!')
+        fftn = cp.fft.fftn
+        ifftn = cp.fft.ifftn
+        fftshift = cp.fft.fftshift
+        ifftshift = cp.fft.ifftshift
+    elif scipy_enabled and get_module_name(xp) == 'numpy':
+        fftn = scipy.fft.fftn
+        ifftn = scipy.fft.ifftn
+        fftshift = scipy.fft.fftshift
+        ifftshift = scipy.fft.ifftshift
+    else:
+        fftn = np.fft.fftn
+        ifftn = np.fft.ifftn
+        fftshift = np.fft.fftshift
+        ifftshift = np.fft.ifftshift
 
     if Psi is None:
         # numOfScales
@@ -41,7 +66,7 @@ def inverseShearletTransformSpect(ST, Psi=None, maxScale='max',
         # -> -1 for lowpass
         # -> divide by for (1, 2, 4, 8,
         # -> +1 results in a 2^# number -> log returns #
-        numOfScales = int(np.log2((ST.shape[-1] - 1)/4 + 1))
+        numOfScales = int(xp.log2((ST.shape[-1] - 1)/4 + 1))
 
         # realCoefficients
         realCoefficients = True
@@ -56,6 +81,8 @@ def inverseShearletTransformSpect(ST, Psi=None, maxScale='max',
                                      realReal=realReal,
                                      shearletSpect=meyerShearletSpect,
                                      shearletArg=meyeraux)
+    else:
+        Psi = xp.asarray(Psi)
 
     # inverse shearlet transform
     if False:
@@ -68,7 +95,7 @@ def inverseShearletTransformSpect(ST, Psi=None, maxScale='max',
         A = A.sum(axis=-1)
         A = ifftn(A)
 
-    if np.isrealobj(ST):
+    if xp.isrealobj(ST):
         A = A.real
 
     return A
