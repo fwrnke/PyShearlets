@@ -100,8 +100,8 @@ def shearletTransformSpect(A, Psi=None, numOfScales=None,
                                      realCoefficients=realCoefficients,
                                      shearletSpect=meyerShearletSpect,
                                      shearletArg=meyeraux)
-    else:
-        Psi = xp.asarray(Psi)
+    # else:
+    #     Psi = xp.asarray(Psi)
 
     # shearlet transform
     if False:

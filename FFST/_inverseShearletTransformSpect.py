@@ -44,7 +44,6 @@ def inverseShearletTransformSpect(ST, Psi=None, maxScale='max',
     xp = get_array_module(ST)
     
     if get_module_name(xp) == 'cupy':
-        warnings.warn('Using CuPy!')
         fftn = cp.fft.fftn
         ifftn = cp.fft.ifftn
         fftshift = cp.fft.fftshift
@@ -81,8 +80,8 @@ def inverseShearletTransformSpect(ST, Psi=None, maxScale='max',
                                      realReal=realReal,
                                      shearletSpect=meyerShearletSpect,
                                      shearletArg=meyeraux)
-    else:
-        Psi = xp.asarray(Psi)
+    # else:
+    #     Psi = xp.asarray(Psi)
 
     # inverse shearlet transform
     if False:
