@@ -1,4 +1,5 @@
 from __future__ import division, print_function, absolute_import
+import warnings
 
 import numpy as np
 
@@ -9,7 +10,6 @@ from ._backends import get_module, get_array_module, get_module_name, cupy_enabl
 
 if cupy_enabled:
     import cupy as cp
-    import warnings
 if scipy_enabled:
     import scipy.fft
 
