@@ -191,7 +191,7 @@ def scalesShearsAndSpectra(shape, numOfScales=None,
             (np.arange(1, (idx_finest_scale + 1) / 2 + 1),
              np.arange((idx_finest_scale + 1) / 2 + 2, shearsPerScale[-1])),
             axis=0)
-        scale_idx = scale_idx.astype(np.int)
+        scale_idx = scale_idx.astype('int')
         if shapem[0]:  # even number of rows -> modify first row:
             idx = slice(1, shape_orig[1])
             Psi[0, idx, scale_idx] = 1 / np.sqrt(2) * (
